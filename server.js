@@ -5,32 +5,31 @@ const mongoose = require("mongoose")
 const path = require('path')
 const cors = require('cors')
 const album = require('./models/albums')
+const mime = require('mime');
 require("dotenv").config()
 
 const port = process.env.PORT
 
-mongoose.connect(process.env.CONNECTION_URL).then(console.log("SUCCEFULLY CONNECTED TO DATABASE")).catch(err => console.log(err))
+mongoose.connect(process.env.CONNECTION_URL)
+.then(console.log("SUCCEFULLY CONNECTED TO DATABASE"))
+.catch(err => console.log(err))
 
 app.use(
-    cors({ origin: "http://127.0.0.1:5500", }), // change to * to allows origin on everything add methods to only allows specific methods like get post put delete
-    express.json() 
+    cors({ origin: "*", }), // change to * to allows origin on everything add methods to only allows specific methods like get post put delete
+    express.json(),
+    express.static(path.join(__dirname, 'public'))
 ) 
- 
-app.listen(port, () => {
-console.log("listening on port", port);
-}) 
 
 app.get('/', async (req, res) => {
-    res.sendFile(path.join(__dirname,'./index.html'))
+    res.sendFile(path.join(__dirname,'./index.html'), )
 });
 
 app.get('/api/albums', async (req, res) => { // return ajson object with all albums
     try {
         await album.find()
         .then(result => {
-            res.json(newdata)
+            res.json(result)
         })
-        console.log("hello world");
     } catch (error) {
         res.status(500)
     }
@@ -74,4 +73,9 @@ app.delete('/api/albums/:id', async (req,res) => { //if id is not found send 404
     } catch (error) {
         res.sendStatus(404)
     }
+    
 })
+
+app.listen(port, () => {
+console.log("listening on port", port);
+}) 
