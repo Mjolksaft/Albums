@@ -1,9 +1,7 @@
 const express = require("express")
 const app = express()
-const db = require("./database")
 const mongoose = require("mongoose")
 const path = require('path')
-const cors = require('cors')
 const album = require('./models/albums')
 const mime = require('mime');
 require("dotenv").config()
@@ -15,9 +13,8 @@ mongoose.connect(process.env.CONNECTION_URL)
 .catch(err => console.log(err))
 
 app.use(
-    cors({ origin: "*", }), // change to * to allows origin on everything add methods to only allows specific methods like get post put delete
     express.json(),
-    express.static(path.join(__dirname, 'public'))
+    express.static(path.join(__dirname, '.')) // This middleware serves files from the root directory with the correct MIME type, so any JavaScript files included in your HTML files should be served with the correct MIME type as well.
 ) 
 
 app.get('/', async (req, res) => {
@@ -52,7 +49,6 @@ app.post('/api/albums', async (req,res) => { // create a album in the database i
         var data = req.body;
         const newAlbum = new album({title: data.title, artist: data.artist, year: data.year})
         await newAlbum.save()
-        res.json(newAlbum)
     } catch (error) {
         
     }
@@ -60,7 +56,15 @@ app.post('/api/albums', async (req,res) => { // create a album in the database i
 
 app.put('/api/albums/:id', async (req,res) => { // if id is not found resnd 404
     try {
-        
+        var id = req.params.id
+        const data = req.body;
+        await album.findByIdAndUpdate(id, data)
+        .then(() => {
+          console.log('User updated successfully');
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     } catch (error) {
         
     }
@@ -68,7 +72,7 @@ app.put('/api/albums/:id', async (req,res) => { // if id is not found resnd 404
 
 app.delete('/api/albums/:id', async (req,res) => { //if id is not found send 404 
     try {
-        const id = req.params.id;
+        const id = req.params.id
         await album.findByIdAndDelete(id)
     } catch (error) {
         res.sendStatus(404)
