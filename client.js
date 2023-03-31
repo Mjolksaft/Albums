@@ -1,5 +1,3 @@
-var allAlbums = []
-
 try {
     const fetchPromise = fetch('http://localhost:5000/api/albums', {
         method: 'GET',
