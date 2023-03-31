@@ -10,7 +10,7 @@ try {
     .then(albums => { // the body of the fetch 
         allAlbums = albums
 
-        const tbl = document.createElement("table");
+        const tbl = document.getElementById("albumTable");
         const tblBody = document.createElement("tbody");
         const row = document.createElement("tr")
         
@@ -103,9 +103,22 @@ function updateAlbum(element) {
     }
 }
 
-function details(element) {
-    const title = allAlbums.find
-    fetch(`http://localhost:5000/api/albums/${title}`)
+function details() {
+    const title = titleText.value
+    if(title == "") {
+        return
+    }
+    else {
+        fetch(`http://localhost:5000/api/albums/${title}`, {
+            method: "GET", 
+        })
+        .then(response => {
+            return response.json()
+        })
+        .then(album => {
+            console.log(album);
+        })
+    }
 }
 
 function addAlbum(){
@@ -121,4 +134,5 @@ function addAlbum(){
         },
         body: JSON.stringify(data)
     })
+    dataValues = Object.values(data)
 }
