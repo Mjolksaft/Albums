@@ -14,7 +14,7 @@ mongoose.connect(process.env.CONNECTION_URL)
 
 app.use(
     express.json(),
-    express.static(path.join(__dirname, '.')) // This middleware serves files from the root directory with the correct MIME type, so any JavaScript files included in your HTML files should be served with the correct MIME type as well.
+    express.static(path.join(__dirname, '.')), // This middleware serves files from the root directory with the correct MIME type, so any JavaScript files included in your HTML files should be served with the correct MIME type as well.
 ) 
 
 app.get('/', async (req, res) => {
@@ -28,19 +28,20 @@ app.get('/api/albums', async (req, res) => { // return ajson object with all alb
             res.json(result)
         })
     } catch (error) {
-        res.status(500)
+        console.log(error);
+        res.status(500).send({ status: 'error', message: error });
     }
 });
 
 app.get('/api/albums/:title', async (req, res) => { //return a jspn object of the given album 
     try {
-        const title =req.params.title
+        const title = req.params.title
         await album.find({title: title})
         .then(result => {
             res.json(result)
         })
     } catch (error) {
-        res.status(500)
+        res.status(404).send({ status: 'error', message: error });
     }
 });
 
@@ -50,7 +51,7 @@ app.post('/api/albums', async (req,res) => { // create a album in the database i
         const newAlbum = new album({title: data.title, artist: data.artist, year: data.year})
         await newAlbum.save()
     } catch (error) {
-        
+        res.status(409).send({ status: 'error', message: error });
     }
 })
 
@@ -60,10 +61,10 @@ app.put('/api/albums/:id', async (req,res) => { // if id is not found resnd 404
         const data = req.body;
         await album.findByIdAndUpdate(id, data)
         .then(() => {
-          console.log('User updated successfully');
+            console.log('User updated successfully');
         })
         .catch((error) => {
-          console.error(error);
+            res.status(404).send({ status: 'error', message: error });
         });
     } catch (error) {
         
@@ -75,11 +76,11 @@ app.delete('/api/albums/:id', async (req,res) => { //if id is not found send 404
         const id = req.params.id
         await album.findByIdAndDelete(id)
     } catch (error) {
-        res.sendStatus(404)
+        res.status(404).send({ status: 'error', message: error });
     }
     
 })
 
 app.listen(port, () => {
-console.log("listening on port", port);
+    console.log("listening on port", port);
 }) 

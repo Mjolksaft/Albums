@@ -1,5 +1,5 @@
 try {
-    const fetchPromise = fetch('http://localhost:5000/api/albums', {
+    const fetchPromise = fetch(`http://localhost:5000/api/albums`, {
         method: 'GET',
     })
     fetchPromise.then(response => { // response message 
@@ -64,20 +64,23 @@ try {
 }
 
 function deleteAlbum(element) {  // gets the parent node and deletes it 
-    const parent = element.parentNode;
-    parent.remove()
-    console.log("hello update ");
-    try {
-        const parent = element.parentNode
-        parentId = parent.id 
-        fetch(`http://localhost:5000/api/albums/${parentId}`, {
-            method: 'DELETE',
-            headers: {
-                "Content-Type": "application/json",
-            },
-        })
-    } catch (error) {
-        console.log(error);
+    let text = "You are about to delete a album";
+    if (confirm(text) == true) {
+      document.getElementById("demo").innerHTML = text;
+      const parent = element.parentNode;
+      parent.remove()
+      try {
+          const parent = element.parentNode
+          parentId = parent.id 
+          fetch(`http://localhost:5000/api/albums/${parentId}`, {
+              method: 'DELETE',
+              headers: {
+                  "Content-Type": "application/json",
+              },
+          })
+      } catch (error) {
+          console.log(error);
+      }
     }
 }
 
