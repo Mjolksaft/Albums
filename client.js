@@ -66,7 +66,6 @@ try {
 function deleteAlbum(element) {  // gets the parent node and deletes it 
     let text = "You are about to delete a album";
     if (confirm(text) == true) {
-      document.getElementById("demo").innerHTML = text;
       const parent = element.parentNode;
       parent.remove()
       try {
@@ -98,6 +97,12 @@ function updateAlbum(element) {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(data)
+        })
+        .then(response => {
+            return response.json()
+        })
+        .then(result => {
+            console.log(result);
         })
     } catch (error) {
         console.log(error);
@@ -134,6 +139,15 @@ function addAlbum(){
             "Content-Type": "application/json",
         },
         body: JSON.stringify(data)
+    })
+    .then(response => {
+        return response.json()
+    })
+    .then(result => {
+        console.log(result);
+    })
+    .catch(error => {
+        console.log(error);
     })
     dataValues = Object.values(data)
 }

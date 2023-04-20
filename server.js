@@ -3,7 +3,6 @@ const app = express()
 const mongoose = require("mongoose")
 const path = require('path')
 const album = require('./models/albums')
-const mime = require('mime');
 require("dotenv").config()
 
 const port = process.env.PORT
@@ -38,6 +37,10 @@ app.get('/api/albums/:title', async (req, res) => { //return a jspn object of th
         const title = req.params.title
         await album.find({title: title})
         .then(result => {
+            if (result.length == 0) {
+                res.status(404).send({status: 'error', message: "title not found"})
+                return
+            }
             res.json(result)
         })
     } catch (error) {
@@ -48,8 +51,18 @@ app.get('/api/albums/:title', async (req, res) => { //return a jspn object of th
 app.post('/api/albums', async (req,res) => { // create a album in the database if the album does not exist 
     try {
         var data = req.body;
+        var compare = []
+        await album.find({title: data.title})
+        .then(result => {
+            compare = result
+        })
+        if (compare.length != 0) {
+            res.status(409).json({message: "entry already exists"})
+            return
+        }
         const newAlbum = new album({title: data.title, artist: data.artist, year: data.year})
         await newAlbum.save()
+        res.status(201).json(newAlbum)
     } catch (error) {
         res.status(409).send({ status: 'error', message: error });
     }
@@ -60,7 +73,7 @@ app.put('/api/albums/:id', async (req,res) => { // if id is not found resnd 404
         var id = req.params.id
         const data = req.body;
         await album.findByIdAndUpdate(id, data)
-        .then(() => {
+        .then(result => {
             console.log('User updated successfully');
         })
         .catch((error) => {
