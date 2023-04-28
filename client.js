@@ -1,5 +1,5 @@
 try {
-    const fetchPromise = fetch(`http://localhost:5000/api/albums`, {
+    const fetchPromise = fetch(`https://albums-capn.onrender.com/api/albums`, {
         method: 'GET',
     })
     fetchPromise.then(response => { // response message 
