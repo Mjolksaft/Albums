@@ -71,7 +71,7 @@ function deleteAlbum(element) {  // gets the parent node and deletes it
       try {
           const parent = element.parentNode
           parentId = parent.id 
-          fetch(`http://localhost:5000/api/albums/${parentId}`, {
+          fetch(`https://albums-capn.onrender.com/api/albums/${parentId}`, {
               method: 'DELETE',
               headers: {
                   "Content-Type": "application/json",
@@ -91,7 +91,7 @@ function updateAlbum(element) {
     try {
         const parent = element.parentNode
         parentId = parent.id 
-        fetch(`http://localhost:5000/api/albums/${parentId}`, {
+        fetch(`https://albums-capn.onrender.com/api/albums/${parentId}`, {
             method: 'PUT',
             headers: {
                 "Content-Type": "application/json",
@@ -115,7 +115,7 @@ function details() {
         return
     }
     else {
-        fetch(`http://localhost:5000/api/albums/${title}`, {
+        fetch(`https://albums-capn.onrender.com/api/albums/${title}`, {
             method: "GET", 
         })
         .then(response => {
@@ -133,7 +133,7 @@ function addAlbum(){
     var year = yearText.value
     const data = {title: title, artist: artist, year: year}
 
-    fetch(`http://localhost:5000/api/albums`, {
+    fetch(`https://albums-capn.onrender.com/api/albums`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
