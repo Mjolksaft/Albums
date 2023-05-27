@@ -94,20 +94,18 @@ function updateAlbum(button) {
     .catch(error => console.log(error));
 }
 
-function details() {
-    const title = prompt("Enter album title");
+function details(button) {
+    const albumRow = button.parentNode;
+    const albumId = albumRow.getAttribute("id");
 
-    if (!title) {
-        return;
-    }
 
-    fetch(`${apiUrl}/${title}`, {
+    console.log(albumId);
+    fetch(`${apiUrl}/${albumId}`, {
         method: "GET"
     })
     .then(response => response.json())
     .then(album => confirm(`${album[0].title + " " + album[0].artist + " " + album[0].year}`))
     .catch(error => console.log(error));
-
 }
 
 function addAlbum() {

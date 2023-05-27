@@ -34,10 +34,10 @@ app.get('/api/albums', async (req, res) => { // return ajson object with all alb
     }
 });
 
-app.get('/api/albums/:title', async (req, res) => { //return a jspn object of the given album 
+app.get('/api/albums/:id', async (req, res) => { //return a jspn object of the given album 
     try {
-        const title = req.params.title
-        await album.find({title: title})
+        const title = req.params.id
+        await album.find({_id: title})
         .then(result => {
             if (result.length == 0) {
                 res.status(404).send({status: 'error', message: "title not found"})
