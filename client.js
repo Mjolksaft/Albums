@@ -13,7 +13,6 @@ function displayAlbums(albums) {
 
     const tableHeaders = ["Title", "Artist", "Year"];
 
-    // Create table headers
     const headerRow = document.createElement("tr");
     for (const tableHeader of tableHeaders) {
         const th = document.createElement("th");
@@ -22,7 +21,6 @@ function displayAlbums(albums) {
     }
     tableBody.appendChild(headerRow);
 
-    // Create table rows for albums
     for (const album of albums) {
         const albumRow = document.createElement("tr");
         const albumData = [album.title, album.artist, album.year];
@@ -126,5 +124,4 @@ function addAlbum() {
     .catch(error => console.log(error));
 }
 
-// Fetch albums when the page loads
 fetchAlbums();
