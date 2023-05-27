@@ -3,6 +3,7 @@ const app = express()
 const mongoose = require("mongoose")
 const path = require('path')
 const album = require('./models/albums')
+const cors = require("cors")
 require("dotenv").config()
 
 const port = process.env.PORT
@@ -12,6 +13,7 @@ mongoose.connect(process.env.CONNECTION_URL)
 .catch(err => console.log(err))
 
 app.use(
+    cors({origin: "http://localhost:5000"}),
     express.json(),
     express.static(path.join(__dirname, '.')), // This middleware serves files from the root directory with the correct MIME type, so any JavaScript files included in your HTML files should be served with the correct MIME type as well.
 ) 

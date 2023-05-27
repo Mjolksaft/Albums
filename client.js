@@ -1,153 +1,132 @@
-try {
-    const fetchPromise = fetch(`https://albums-capn.onrender.com/api/albums`, {
-        method: 'GET',
-    })
-    fetchPromise.then(response => { // response message 
-        return response.json();
-    })
-    .then(albums => { // the body of the fetch 
-        allAlbums = albums
+const apiUrl = "http://localhost:5000/api/albums";
 
-        const tbl = document.getElementById("albumTable");
-        const tblBody = document.createElement("tbody");
-        const row = document.createElement("tr")
-        
-        var data = { title: null, artist: null, year: null} // so we can iterate over the data we want to display 
-        const tableHeaders = Object.keys(data)
-        for (const tableHead of tableHeaders) {
-            const cell = document.createElement("th")
-            const cellText = document.createTextNode(tableHead);
-            
-            cell.appendChild(cellText);
-            row.appendChild(cell);
-            tblBody.appendChild(row);
-        }
-        for (const album of albums) {
-            data = { title: album.title, artist: album.artist, year: album.year} // so we can iterate over the data we want to display 
-            data = Object.values(data)
-            
-            const row = document.createElement("tr");
-            
-            for (const value of data) {
-                const cell = document.createElement("td");
-                const cellText = document.createTextNode(value);
-                
-                cell.appendChild(cellText);
-                row.appendChild(cell);
-                tblBody.appendChild(row);
-            }
-            deleteButton = document.createElement("button")
-            deleteButton.innerText = "Delete"
-            deleteButton.setAttribute("id", "delete")
-            deleteButton.setAttribute("onclick", 'deleteAlbum(this)')
-            
-            updateButton = document.createElement("button")
-            updateButton.innerText = "Update"
-            updateButton.setAttribute("id", "update")
-            updateButton.setAttribute("onclick", 'updateAlbum(this)')
-            
-            detailsButton = document.createElement("button")
-            detailsButton.innerText = "Details"
-            detailsButton.setAttribute("id", "details")
-            detailsButton.setAttribute("onclick", 'details()')
-            
-            row.appendChild(deleteButton)
-            row.appendChild(updateButton)
-            row.appendChild(detailsButton)
-            row.setAttribute("id", album._id)
-        }
-        tbl.appendChild(tblBody);
-        document.body.appendChild(tbl);
-    });   
-} catch (error) {
-    console.log(error);
+function fetchAlbums() {
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(albums => displayAlbums(albums))
+        .catch(error => console.log(error));
 }
 
-function deleteAlbum(element) {  // gets the parent node and deletes it 
-    let text = "You are about to delete a album";
-    if (confirm(text) == true) {
-      const parent = element.parentNode;
-      parent.remove()
-      try {
-          const parent = element.parentNode
-          parentId = parent.id 
-          fetch(`https://albums-capn.onrender.com/api/albums/${parentId}`, {
-              method: 'DELETE',
-              headers: {
-                  "Content-Type": "application/json",
-              },
-          })
-      } catch (error) {
-          console.log(error);
-      }
+function displayAlbums(albums) {
+    const table = document.getElementById("albumTable");
+    const tableBody = document.createElement("tbody");
+
+    const tableHeaders = ["Title", "Artist", "Year"];
+
+    // Create table headers
+    const headerRow = document.createElement("tr");
+    for (const tableHeader of tableHeaders) {
+        const th = document.createElement("th");
+        th.textContent = tableHeader;
+        headerRow.appendChild(th);
     }
+    tableBody.appendChild(headerRow);
+
+    // Create table rows for albums
+    for (const album of albums) {
+        const albumRow = document.createElement("tr");
+        const albumData = [album.title, album.artist, album.year];
+
+        for (const albumValue of albumData) {
+            const td = document.createElement("td");
+            td.textContent = albumValue;
+            albumRow.appendChild(td);
+        }
+
+        const deleteButton = createButton("Delete", "deleteAlbum");
+        const updateButton = createButton("Update", "updateAlbum");
+        const detailsButton = createButton("Details", "details");
+
+        albumRow.appendChild(deleteButton);
+        albumRow.appendChild(updateButton);
+        albumRow.appendChild(detailsButton);
+        albumRow.setAttribute("id", album._id);
+
+        tableBody.appendChild(albumRow);
+    }
+
+    table.appendChild(tableBody);
 }
 
-function updateAlbum(element) {
-    const title = titleText.value
-    var artist = artistText.value
-    var year = yearText.value
-    const data = {title: title, artist: artist, year: year}
-    try {
-        const parent = element.parentNode
-        parentId = parent.id 
-        fetch(`https://albums-capn.onrender.com/api/albums/${parentId}`, {
-            method: 'PUT',
+function createButton(text, onclickFunction) {
+    const button = document.createElement("button");
+    button.textContent = text;
+    button.addEventListener("click", () => window[onclickFunction](button));
+    return button;
+}
+
+function deleteAlbum(button) {
+    const albumRow = button.parentNode;
+    const albumId = albumRow.getAttribute("id");
+    const confirmation = confirm("You are about to delete an album");
+
+    if (confirmation) {
+        albumRow.remove();
+
+        fetch(`${apiUrl}/${albumId}`, {
+            method: 'DELETE',
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(data)
-        })
-        .then(response => {
-            return response.json()
-        })
-        .then(result => {
-            console.log(result);
-        })
-    } catch (error) {
-        console.log(error);
+        }).catch(error => console.log(error));
     }
+}
+
+function updateAlbum(button) {
+    const albumRow = button.parentNode;
+    const albumId = albumRow.getAttribute("id");
+
+    const title = prompt("Enter new title");
+    const artist = prompt("Enter new artist");
+    const year = prompt("Enter new year");
+
+    const data = { title, artist, year };
+
+    fetch(`${apiUrl}/${albumId}`, {
+        method: 'PUT',
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => console.log(result))
+    .catch(error => console.log(error));
 }
 
 function details() {
-    const title = titleText.value
-    if(title == "") {
-        return
+    const title = prompt("Enter album title");
+
+    if (!title) {
+        return;
     }
-    else {
-        fetch(`https://albums-capn.onrender.com/api/albums/${title}`, {
-            method: "GET", 
-        })
-        .then(response => {
-            return response.json()
-        })
-        .then(album => {
-            console.log(album);
-        })
-    }
+
+    fetch(`${apiUrl}/${title}`, {
+        method: "GET"
+    })
+    .then(response => response.json())
+    .then(album => confirm(`${album[0].title + " " + album[0].artist + " " + album[0].year}`))
+    .catch(error => console.log(error));
+
 }
 
-function addAlbum(){
-    const title = titleText.value
-    var artist = artistText.value
-    var year = yearText.value
-    const data = {title: title, artist: artist, year: year}
+function addAlbum() {
+    const title = prompt("Enter album title");
+    const artist = prompt("Enter artist");
+    const year = prompt("Enter year");
+    const data = { title, artist, year };
 
-    fetch(`https://albums-capn.onrender.com/api/albums`, {
+    fetch(apiUrl, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
         body: JSON.stringify(data)
     })
-    .then(response => {
-        return response.json()
-    })
-    .then(result => {
-        console.log(result);
-    })
-    .catch(error => {
-        console.log(error);
-    })
-    dataValues = Object.values(data)
+    .then(response => response.json())
+    .then(result => console.log(result))
+    .catch(error => console.log(error));
 }
+
+// Fetch albums when the page loads
+fetchAlbums();
